@@ -13,6 +13,7 @@ import com.tutorial.mario.tile.Tile;
 public class Player extends Entity {
 	
 	private PlayerState state;
+	private int pixelsTravelled = 0;
 	
 	private int frame = 0;
 	private int frameDelay = 0;
@@ -27,31 +28,27 @@ public class Player extends Entity {
 	
 	}
 
-	@Override
 	public void render(Graphics g) {
 		// TODO Auto-generated method stub
 		if(facing==0){
 			g.drawImage(Game.player[frame+5].getBufferedImage(), x, y, width, height, null);
 		}else if(facing==1){
 			g.drawImage(Game.player[frame].getBufferedImage(), x, y, width, height, null);
-
 		}
 	}
 
-	@Override
 	public void tick() {
-		// TODO Auto-generated method stub
 		x+=velX;
 		y+=velY; 
-		if(x<=0) x = 0;
-//		if(y<=0) y = 0; removed for platform game purposes
-		
+		if(goingDownPipe){
+			pixelsTravelled+=velY;
+		}
 		if(y+height >= 771) y=771-height;
 		if(velX!=0) animate=true;
 		else animate = false;
 		for(int i=0;i<handler.tile.size();i++){
 			Tile t = handler.tile.get(i);
-			if(t.isSolid()){
+			if(t.isSolid()&&!goingDownPipe){
 				if(getBoundsTop().intersects(t.getBounds())){
 					setVelY(0);
 //					y = t.getY()+t.height; removed for platform game purposes
@@ -118,7 +115,7 @@ public class Player extends Entity {
 		}
 		
 		
-		if(jumping){
+		if(jumping&&!goingDownPipe){
 			gravity-=0.1;
 			setVelY((int)-gravity);
 			if(gravity<=0.0){
@@ -126,7 +123,7 @@ public class Player extends Entity {
 				falling = true;
 			}
 		}
-		if(falling){
+		if(falling&&!goingDownPipe){
 			gravity+=0.1;
 			setVelY((int)gravity);
 		}
@@ -139,8 +136,23 @@ public class Player extends Entity {
 				}
 				frameDelay=0;			
 			}
+		}
 		
-				
+		if(goingDownPipe){
+			for(int i=0;i<Game.handler.tile.size();i++){
+				Tile t = Game.handler.tile.get(i);
+				if(t.getId()==Id.pipe){
+					switch(t.facing){
+					case 0:
+						setVelY(-5);
+						break;
+					case 2:
+						setVelY(5);
+						break;
+					}
+					if(pixelsTravelled>t.height+height) goingDownPipe=false;
+				}
+			}
 		}
 
 	}

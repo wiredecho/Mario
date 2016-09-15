@@ -14,7 +14,8 @@ public abstract class Entity {
 	
 
 	public boolean jumping = false;
-	public boolean falling = true;
+	public boolean falling = false;
+	public boolean goingDownPipe = false;
 	
 	public int velX, velY;
 	public int frame=0;

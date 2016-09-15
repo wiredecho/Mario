@@ -13,6 +13,7 @@ public abstract class Tile {
 //	public boolean solid;
 	
 	public int velX, velY;
+	public int facing;
 	
 	public boolean solid = false;
 	public boolean activated = false;
